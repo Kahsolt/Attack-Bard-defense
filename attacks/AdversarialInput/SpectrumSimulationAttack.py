@@ -296,6 +296,7 @@ class SpectrumSimulationAttack(AdversarialInputAttacker):
 class SSA_CommonWeakness(AdversarialInputAttacker):
     def __init__(self,
                  model: List[nn.Module],
+                 dfn: nn.Identity(),
                  total_step: int = 10,
                  random_start: bool = False,
                  step_size: float = 16 / 255 / 5,
@@ -318,6 +319,7 @@ class SSA_CommonWeakness(AdversarialInputAttacker):
         self.reverse_step_size = reverse_step_size
         super(SSA_CommonWeakness, self).__init__(model, *args, **kwargs)
         self.inner_step_size = inner_step_size
+        self.dfn = dfn
 
     def perturb(self, x):
         x = x + (torch.rand_like(x) - 0.5) * 2 * self.epsilon
@@ -421,7 +423,9 @@ class SSA_CommonWeakness(AdversarialInputAttacker):
             mask = (torch.rand_like(x) * 2 * rho + 1 - rho).cuda()
             x_idct = idct_2d(x_dct * mask)
             x_idct = V(x_idct, requires_grad=True)
-            logit = model(x_idct.to(model.device)).to(x_idct.device)
+            x = x_idct.to(model.device)
+            x = self.dfn(x)
+            logit = model(x).to(x_idct.device)
             loss = self.criterion(logit, y)
             loss.backward()
             x.requires_grad = False
