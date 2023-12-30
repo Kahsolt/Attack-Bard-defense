@@ -2,16 +2,23 @@
 # Author: Armit
 # Create Time: 2023/12/07 
 
-import torch
-import torch.nn as nn
-import torch.nn.functional as F
-import torchvision.transforms.functional as TF
-from torch import Tensor
+from defenses.utils import *
+
+parser = ArgumentParser()
+# ↓↓↓ You can tune these ↓↓↓
+parser.add_argument("--k", type=int, default=5)
+parser.add_argument("--s", type=float, default=1.5)
+args, _ = parser.parse_known_args()
+
+if 'model config':
+  k = args.k
+  s = args.s
+  assert k % 2 == 1 and k > 1
 
 
-class BlurAndSharpen:
+class BlurAndSharpen_dfn:
 
-  def __init__(self, k:int=5, s:float=1e-5):
+  def __init__(self):
     self.k = k
     self.s = s
 
@@ -31,7 +38,7 @@ class BlurAndSharpen:
     return x
 
 
-class BlurAndSharpenMy:
+class BlurAndSharpenMy_dfn:
 
   def __init__(self):
     # https://blog.csdn.net/lphbtm/article/details/18001933
@@ -73,7 +80,7 @@ if __name__ == '__main__':
   X  = torch.from_numpy(im_raw).permute([2, 0, 1]).unsqueeze_(0)
   AX = torch.from_numpy(im_adv).permute([2, 0, 1]).unsqueeze_(0)
 
-  dfn = BlurAndSharpen()
+  dfn = BlurAndSharpen_dfn()
   with torch.no_grad():
     X_dfn:  Tensor = dfn(X)
     AX_dfn: Tensor = dfn(AX)

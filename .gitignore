@@ -229,3 +229,10 @@ cython_debug/
 .idea/
 .resources/
 resources/
+
+# vscode
+.vscode/
+
+# 3rd party
+repo/*
+!repo/*.cmd

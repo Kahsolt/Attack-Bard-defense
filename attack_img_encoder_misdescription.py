@@ -11,7 +11,7 @@ from attacks import SpectrumSimulationAttack, SSA_CommonWeakness
 from torchvision import transforms
 import os
 
-from defenses import *
+from helper import *
 
 images = get_list_image("./dataset/NIPS17")
 resizer = transforms.Resize((224, 224))
@@ -22,7 +22,7 @@ clip = ClipFeatureExtractor().eval().cuda().requires_grad_(False)
 vit = VisionTransformerFeatureExtractor().eval().cuda().requires_grad_(False)
 models = [vit, blip, clip]
 
-dfn = BlurAndSharpen()
+dfn = get_dfn()
 
 def ssa_cw_count_to_index(count, num_models=len(models), ssa_N=20):
     max = ssa_N * num_models

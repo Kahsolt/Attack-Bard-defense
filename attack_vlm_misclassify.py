@@ -5,7 +5,7 @@ from utils.ImageHandling import save_multi_images, save_image, get_list_image
 from torchvision import transforms
 import os
 
-from defenses import *
+from helper import *
 
 images = get_list_image("./dataset/NIPS17")
 resizer = transforms.Resize((224, 224))
@@ -33,7 +33,7 @@ blip2 = Blip2VisionModel(target_text=target_text)
 instruct_blip = InstructBlipVisionModel(target_text=target_text)
 gpt4 = get_gpt4_image_model(target_text=target_text)
 
-dfn = BlurAndSharpen()
+dfn = get_dfn()
 
 attacker = SSA_CommonWeakness(
     [instruct_blip, blip2, gpt4],

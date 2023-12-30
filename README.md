@@ -4,12 +4,15 @@
 
 ----
 
-Meow meow meow??
+**Follow run guide in [FIXME.md](FIXME.md)**
 
 
 # Acknowledgement
 
 - base repo: [https://github.com/thu-ml/Attack-Bard](https://github.com/thu-ml/Attack-Bard)
+- Real-ESRGAN: [https://github.com/xinntao/Real-ESRGAN](https://github.com/xinntao/Real-ESRGAN)
+- SCUNet: [https://github.com/cszn/SCUNet](https://github.com/cszn/SCUNet)
+- DDNM: [https://github.com/wyhuai/DDNM](https://github.com/wyhuai/DDNM)
 
 ```
 @article{dong2023robust,
