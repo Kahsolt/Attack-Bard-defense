@@ -36,7 +36,7 @@ ssa_cw_loss = EnsembleFeatureLoss(models, ssa_cw_count_to_index, feature_loss=to
 
 attacker = SSA_CommonWeakness(
     models,
-    dfn,
+    dfn=dfn,
     epsilon=16 / 255,
     step_size=1 / 255,
     total_step=500,

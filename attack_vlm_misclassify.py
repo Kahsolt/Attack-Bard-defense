@@ -37,7 +37,7 @@ dfn = get_dfn()
 
 attacker = SSA_CommonWeakness(
     [instruct_blip, blip2, gpt4],
-    dfn,
+    dfn=dfn,
     epsilon=16 / 255,
     step_size=1 / 255,
     total_step=500,
