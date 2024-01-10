@@ -142,3 +142,5 @@ if __name__ == '__main__':
   print('x.shape:', x.shape)
   y = dfn(x)
   print('y.shape:', y.shape)
+  d = (x - y).abs().mean().item()
+  print('err:', d)

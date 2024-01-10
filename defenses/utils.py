@@ -6,6 +6,7 @@ import os
 import sys
 from argparse import ArgumentParser
 from pathlib import Path
+from types import MethodType
 
 import torch
 import torch.nn as nn

@@ -12,11 +12,13 @@ DEFENSES = {
   'realesrgan': RealESRGAN_dfn,
   'scunet': SCUNet_dfn,
   'ddnm': DDNM_dfn,
+  'mae': MAE_dfn,
+  'dmae': DMAE_dfn,
 }
 
 
 def get_dfn():
   parser = ArgumentParser()
-  parser.add_argument('--dfn', required=True, choices=['none', 'blur_and_sharpen', 'realesrgan', 'scunet', 'ddnm'])
+  parser.add_argument('--dfn', required=True, choices=DEFENSES.keys())
   args, _ = parser.parse_known_args()
   return DEFENSES[args.dfn]()

@@ -9,7 +9,7 @@ from models.network_scunet import SCUNet
 
 parser = ArgumentParser()
 # ↓↓↓ You can tune these ↓↓↓
-parser.add_argument('--model_name', type=str, default='scunet_color_real_psnr', help='scunet_color_real_psnr, scunet_color_real_gan')
+parser.add_argument('--model_name', type=str, default='scunet_color_real_psnr', choices=['scunet_color_real_psnr', 'scunet_color_real_gan'])
 args, _ = parser.parse_known_args()
 
 if 'model config':
@@ -36,3 +36,5 @@ if __name__ == '__main__':
   print('x.shape:', x.shape)
   y = dfn(x)
   print('y.shape:', y.shape)
+  d = (x - y).abs().mean().item()
+  print('err:', d)
