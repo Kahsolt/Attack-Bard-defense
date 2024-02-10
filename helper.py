@@ -15,6 +15,8 @@ DEFENSES = {
   'mae': MAE_dfn,
   'dmae': DMAE_dfn,
   'comdef': ComDefend_dfn,
+  'jpeg': JPEG_dfn,
+  'lgs': LGS_dfn,
 }
 
 

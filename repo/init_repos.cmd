@@ -7,8 +7,12 @@ git clone https://github.com/cszn/SCUNet
 git clone https://github.com/wyhuai/DDNM
 git clone https://github.com/facebookresearch/mae
 git clone https://github.com/quanlin-wu/dmae
-
 git clone https://github.com/jiaxiaojunQAQ/Comdefend
+git clone https://github.com/mlomnitz/DiffJPEG
+
+REM git clone https://github.com/mmSir/GainedVAE
+REM git clone https://github.com/fab-jul/L3C-PyTorch
+REM git clone https://github.com/Justin-Tan/high-fidelity-generative-compression
 
 POPD
 
