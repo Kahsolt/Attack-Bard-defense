@@ -10,12 +10,7 @@
 # Acknowledgement
 
 - Attack-Bard: [https://github.com/thu-ml/Attack-Bard](https://github.com/thu-ml/Attack-Bard)
-- Real-ESRGAN: [https://github.com/xinntao/Real-ESRGAN](https://github.com/xinntao/Real-ESRGAN)
-- SCUNet: [https://github.com/cszn/SCUNet](https://github.com/cszn/SCUNet)
-- DDNM: [https://github.com/wyhuai/DDNM](https://github.com/wyhuai/DDNM)
-- MAE: [https://github.com/facebookresearch/mae](https://github.com/facebookresearch/mae)
-- dMAE: [https://github.com/quanlin-wu/dmae](https://github.com/quanlin-wu/dmae)
-- Comdefend: [https://github.com/jiaxiaojunQAQ/Comdefend](https://github.com/jiaxiaojunQAQ/Comdefend)
+- all defensive repos see: [init_repos](repo/init_repos.cmd)
 
 ```
 @article{dong2023robust,

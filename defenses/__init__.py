@@ -8,5 +8,6 @@ from .mae import MAE_dfn
 from .dmae import DMAE_dfn
 from .comdefend import ComDefend_dfn
 from .jpeg import JPEG_dfn
+from .local_grad_smooth import LGS_dfn
 
 from .utils import *

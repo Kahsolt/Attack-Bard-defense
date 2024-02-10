@@ -30,3 +30,8 @@
 ### dMAE
 
 - 参考README.md，下载对应的权重文件放在对应仓库的 `models` 的目录下 (自行创建)
+
+
+### local_grad_smooth
+
+- 注释掉 `repo\local_gradients_smoothing\lgs\__init__.py` 第 3~5 行
