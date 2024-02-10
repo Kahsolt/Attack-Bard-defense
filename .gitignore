@@ -236,3 +236,7 @@ resources/
 # 3rd party
 repo/*
 !repo/*.cmd
+
+# log
+log/
+*.log
