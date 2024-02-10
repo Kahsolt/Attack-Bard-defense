@@ -296,7 +296,7 @@ class SpectrumSimulationAttack(AdversarialInputAttacker):
 class SSA_CommonWeakness(AdversarialInputAttacker):
     def __init__(self,
                  model: List[nn.Module],
-                 dfn: nn.Identity(),
+                 dfn: Callable = nn.Identity(),
                  total_step: int = 10,
                  random_start: bool = False,
                  step_size: float = 16 / 255 / 5,
