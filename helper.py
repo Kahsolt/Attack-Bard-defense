@@ -14,6 +14,7 @@ DEFENSES = {
   'ddnm': DDNM_dfn,
   'mae': MAE_dfn,
   'dmae': DMAE_dfn,
+  'comdef': ComDefend_dfn,
 }
 
 
