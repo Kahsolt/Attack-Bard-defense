@@ -6,6 +6,31 @@ from defenses.utils import *
 LGS_PATH = REPO_PATH / 'local_gradients_smoothing'
 register_path(LGS_PATH)
 from lgs import LocalGradientsSmoothing
+from lgs import Gradient, GradientSmooth
+
+
+def Gradient_forward_hijack(self:Gradient, img:Tensor):
+  batch_size = img.shape[0]
+  img_aux = img.reshape(-1, img.shape[-2], img.shape[-1]).unsqueeze(1)
+  grad_x = self.d_x(img_aux)
+  grad_y = self.d_y(img_aux)
+  grad = self.zero_pad_x(grad_x).pow(2) + self.zero_pad_y(grad_y).pow(2)
+  grad = grad.sqrt()
+  grad = grad.squeeze(1).reshape(batch_size, -1, img_aux.shape[-2], img_aux.shape[-1])
+  return grad
+
+Gradient.forward = Gradient_forward_hijack
+
+
+def GradientSmooth_forward_hijack(self:GradientSmooth, img:Tensor):
+  batch_size = img.shape[0]
+  img_aux = img.reshape(-1, img.shape[-2], img.shape[-1]).unsqueeze(1)
+  grad = self.d_x(img_aux).pow(2) + self.d_y(img_aux).pow(2)
+  grad = grad.sqrt()
+  grad = grad.squeeze(1).reshape(batch_size, -1, img_aux.shape[-2], img_aux.shape[-1])
+  return grad
+
+GradientSmooth.forward = GradientSmooth_forward_hijack
 
 
 class LGS_dfn:
