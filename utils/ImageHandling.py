@@ -7,6 +7,7 @@ from torch import Tensor
 import cv2
 from typing import List, Callable
 from tqdm import tqdm
+from pathlib import Path
 
 
 @torch.no_grad()
@@ -60,9 +61,11 @@ def get_image(path: str = "image.jpg") -> Tensor:
     return transform(image)
 
 
-def get_list_image(path: str) -> List[Tensor]:
+def get_list_image(path: str, limit: int=-1) -> List[Tensor]:
     result = []
     images = os.listdir(path)
+    images.sort(key=lambda k: int(Path(k).stem))    # keep order
+    if limit > 0: images = images[:limit]
     for image in images:
         result.append(get_image(os.path.join(path, image)))
     return result

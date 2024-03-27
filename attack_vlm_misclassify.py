@@ -7,7 +7,7 @@ import os
 
 from defenses import get_dfn
 
-images = get_list_image("./dataset/NIPS17")
+images = get_list_image("./dataset/NIPS17", limit=100)
 resizer = transforms.Resize((224, 224))
 images = [resizer(i).unsqueeze(0) for i in images]
 

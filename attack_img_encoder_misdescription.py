@@ -13,7 +13,7 @@ import os
 
 from defenses import get_dfn
 
-images = get_list_image("./dataset/NIPS17")
+images = get_list_image("./dataset/NIPS17", limit=100)
 resizer = transforms.Resize((224, 224))
 images = [resizer(i).unsqueeze(0) for i in images]
 
@@ -39,7 +39,7 @@ attacker = SSA_CommonWeakness(
     dfn=dfn,
     epsilon=16 / 255,
     step_size=1 / 255,
-    total_step=500,
+    total_step=100,
     criterion=ssa_cw_loss,
 )
 
