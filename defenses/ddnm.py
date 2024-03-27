@@ -13,6 +13,7 @@ from main import dict2namespace
 from guided_diffusion.script_util import create_model
 from guided_diffusion.diffusion import Diffusion, get_schedule_jump, compute_alpha, inverse_data_transform, MeanUpsample
 from functions.ckpt_util import download
+from datasets import data_transform
 
 parser = ArgumentParser()
 # ↓↓↓ You can tune these ↓↓↓
@@ -53,7 +54,7 @@ def setup_model(self:Diffusion):
   model = torch.nn.DataParallel(model)
   return model
 
-def simplified_ddnm_plus_hijack(self:Diffusion, model:Module, y:Tensor) -> Tensor:
+def simplified_ddnm_plus_hijack(self:Diffusion, model:Module, x_orig:Tensor) -> Tensor:
   g = torch.Generator()
   g.manual_seed(args.seed)
 
@@ -68,6 +69,11 @@ def simplified_ddnm_plus_hijack(self:Diffusion, model:Module, y:Tensor) -> Tenso
 
   args.sigma_y = 2 * args.sigma_y # to account for scaling to [-1,1]
   sigma_y = args.sigma_y
+
+  x_orig = x_orig.to(self.device)
+  x_orig = data_transform(self.config, x_orig)
+
+  y = A(x_orig)
 
   # init x_T
   x = torch.randn(
