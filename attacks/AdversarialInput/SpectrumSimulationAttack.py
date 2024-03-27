@@ -423,11 +423,12 @@ class SSA_CommonWeakness(AdversarialInputAttacker):
             mask = (torch.rand_like(x) * 2 * rho + 1 - rho).cuda()
             x_idct = idct_2d(x_dct * mask)
             x_idct = V(x_idct, requires_grad=True)
-            x = x_idct.to(model.device)
+            x = x_idct.to(model.device).to(torch.device("cuda:0"))
             x = self.dfn(x)
             logit = model(x).to(x_idct.device)
             loss = self.criterion(logit, y)
             loss.backward()
+            x = x.detach()
             x.requires_grad = False
             noise += x_idct.grad.data
             x.grad = None
