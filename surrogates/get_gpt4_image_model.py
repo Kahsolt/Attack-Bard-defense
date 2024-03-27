@@ -5,7 +5,6 @@ import random
 import numpy as np
 import torch
 import torch.backends.cudnn as cudnn
-import gradio as gr
 import copy
 
 from minigpt4.common.config import Config
