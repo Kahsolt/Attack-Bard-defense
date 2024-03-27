@@ -11,3 +11,24 @@ from .jpeg import JPEG_dfn
 from .local_grad_smooth import LGS_dfn
 
 from .utils import *
+
+
+DEFENSES = {
+  'none': nn.Identity,
+  'blur_and_sharpen': BlurAndSharpen_dfn,
+  'realesrgan': RealESRGAN_dfn,
+  'scunet': SCUNet_dfn,
+  'ddnm': DDNM_dfn,
+  'mae': MAE_dfn,
+  'dmae': DMAE_dfn,
+  'comdef': ComDefend_dfn,
+  'jpeg': JPEG_dfn,
+  'lgs': LGS_dfn,
+}
+
+
+def get_dfn():
+  parser = ArgumentParser()
+  parser.add_argument('--dfn', required=True, choices=DEFENSES.keys())
+  args, _ = parser.parse_known_args()
+  return DEFENSES[args.dfn]()

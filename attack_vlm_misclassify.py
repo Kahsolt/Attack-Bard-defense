@@ -5,7 +5,7 @@ from utils.ImageHandling import save_multi_images, save_image, get_list_image
 from torchvision import transforms
 import os
 
-from helper import *
+from defenses import get_dfn
 
 images = get_list_image("./dataset/NIPS17")
 resizer = transforms.Resize((224, 224))

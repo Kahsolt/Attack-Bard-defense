@@ -11,7 +11,7 @@ from attacks import SpectrumSimulationAttack, SSA_CommonWeakness
 from torchvision import transforms
 import os
 
-from helper import *
+from defenses import get_dfn
 
 images = get_list_image("./dataset/NIPS17")
 resizer = transforms.Resize((224, 224))
