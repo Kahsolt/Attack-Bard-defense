@@ -2,11 +2,17 @@
 # Author: Armit
 # Create Time: 2022/09/27 
 
+# misc utils for image processing or anything common :(
+
 import warnings ; warnings.filterwarnings('ignore', category=UserWarning)
 
+import base64
 from pathlib import Path
+import hashlib
+import imagehash
 from PIL import Image, ImageFilter
 from PIL.Image import Image as PILImage
+from datetime import datetime
 from typing import *
 
 import torch
@@ -33,6 +39,22 @@ npimg_f32 = NDArray[np.float32]     # vrng [0, 1]
 npimg = Union[npimg_u8, npimg_f32]
 npimg_dx = NDArray[np.int16]        # vrng [-255, 255]
 npimg_hi = NDArray[np.float32]      # vrng [-1, 1]
+
+
+def now() -> int:
+  return int(datetime.now().timestamp())
+
+
+def hash_str(s:str) -> str:  # len=32
+  return hashlib.md5(s.encode(encoding='utf-8')).hexdigest()
+
+def hash_img(img:PILImage) -> str:  # len=64
+  return str(imagehash.average_hash(img, hash_size=16))
+
+def base64_img(fp:Path):
+  with open(fp, 'rb') as fh:
+    codec = base64.b64encode(fh.read()).decode()
+  return codec
 
 
 def load_img(fp:Path) -> PILImage:

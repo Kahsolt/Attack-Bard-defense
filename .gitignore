@@ -240,3 +240,10 @@ repo/*
 # log
 log/
 *.log
+
+# ref
+ref/
+
+# API_KEY
+API_KEY.*
+!API_KEY.*.example

@@ -1,0 +1,5 @@
+# API key from Baidu qianfan platform
+# https://console.bce.baidu.com/qianfan/ais/console/applicationConsole/application
+API_KEY: your_api_key
+SECRET_KEY: your_secret_key
+API_EP: your_api_url_endpoint
