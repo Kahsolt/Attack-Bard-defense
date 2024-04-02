@@ -10,7 +10,9 @@
 # https://cloud.baidu.com/doc/WENXINWORKSHOP/s/nlrobz49b
 
 import os
+import json
 import yaml
+import base64
 from pathlib import Path
 from pprint import pprint as pp
 from argparse import ArgumentParser
@@ -26,6 +28,7 @@ QUERY_PROMPT_CN = '''
 分析一下图片画了什么
 '''
 
+PROVIDER = 'fuyu-8b'
 API_EP = None
 API_KEY = None
 SECRET_KEY = None
@@ -79,10 +82,10 @@ def query(fp:Path, prompt:str) -> Dict:
   url = f'https://aip.baidubce.com/rpc/2.0/ai_custom/v1/wenxinworkshop/image2text/{API_EP}?access_token={ACCESS_TOKEN}'
   payload = {
     'prompt': prompt,
-    'image': base64_img(fp),
+    'image': base64.b64encode(read_file(fp)).decode(),
   }
   try:
-    resp = http.post(url, headers=HEADERS, json=payload)
+    resp = http.post(url, headers=HEADERS, json=payload, timeout=10)
     data: Dict = resp.json()
   except:
     print_exc()
@@ -98,24 +101,40 @@ def query(fp:Path, prompt:str) -> Dict:
   return data
 
 
-def run(args):
-  fps = list(Path(args.img_dp).iterdir())
-  fps.sort(key=lambda k: int(Path(k).stem))   # keep order
-  if args.limit > 0: fps = fps[:args.limit]   # limit count 
+def walk(dp:Path):
+  for p in dp.iterdir():
+    if p.is_dir():
+      yield from walk(p)
+    else:
+      yield p.resolve()
 
+
+def run(args):
+  fps = list(walk(args.img_dp))
+  fps.sort()  # somewhat keep ordered
+  if args.limit > 0: fps = fps[:args.limit]
+
+  tot, ok, err, ign = 0, 0, 0, 0
   db = RecordDB(args.db_fp)
   try:
-    for fp in fps:
+    pid = db.get_prompt_id(QUERY_PROMPT)
+    for fp in tqdm(fps):
+      tot += 1
+      iid = db.get_image_id(fp)
+      if args.ignore_queried and db.has(pid, iid):
+        ign += 1
+        continue
+
       ts_req = now()
       res = query(fp, QUERY_PROMPT)
       ts_res = now()
-
       if res is None:
         print('>> error query:', fp)
+        err += 1
         continue
 
-      img = Image.open(fp).convert('RGB')
-      db.add(prompt, img, res, ts_req, ts_res)
+      db.add(pid, iid, json.dumps(res), ts_req, ts_res, PROVIDER)
+      ok += 1
   except KeyboardInterrupt:
     print('>> Exit by Ctrl+C')
   except:
@@ -123,13 +142,16 @@ def run(args):
   finally:
     db.close()
 
+  print(f'>> [Done] tot={tot}, ok={ok}, err={err}, ign={ign}')
+
 
 if __name__ == '__main__':
   parser = ArgumentParser()
-  parser.add_argument('-I', '--img_dp', required=True, type=Path, help='image folder')
+  parser.add_argument('-I', '--img_dp', default='outputs', type=Path, help='image folder, will walk recursively')
   parser.add_argument('-L', '--limit', default=-1, type=int, help='limit input image count')
-  parser.add_argument('-O', '--db_fp', default=LOG_PATH / 'query_api.sqlite3', type=Path, help='query record database file')
+  parser.add_argument('-O', '--db_fp', default=DB_FILE, type=Path, help='query record database file')
   parser.add_argument('-K', '--key_fp', default='API_KEY.yaml', type=Path, help='credential key file (*.yaml)')
+  parser.add_argument('--ignore_queried', action='store_true', help='ignore query if already has records')
   args = parser.parse_args()
 
   setup(args.key_fp)

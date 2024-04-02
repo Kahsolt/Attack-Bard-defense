@@ -241,6 +241,9 @@ repo/*
 log/
 *.log
 
+# generated
+outputs/
+
 # ref
 ref/
 
