@@ -21,19 +21,18 @@ from traceback import print_exc
 import requests as R
 from utils.record_db import *
 
-QUERY_PROMPT = '''
-introduce the picture
-'''
-QUERY_PROMPT_CN = '''
-分析一下图片画了什么
-'''
+QUERY_PROMPTS = [
+  'describe the picture',
+  'describe the picture briefly',
+  'describe the picture briefly, within 10 words',
+  'describe the picture in details',
+  'describe the picture in details as much as possible, more than 150 words',
+]
 
-PROVIDER = 'fuyu-8b'
-API_EP = None
-API_KEY = None
-SECRET_KEY = None
-ACCESS_TOKEN = None
+PROVIDER = 'fuyu_8b'
 
+API_EP_FREE = 'fuyu_8b'
+API_URL = None
 HEADERS = {
   'Content-Type': 'application/json',
   'Accept': 'application/json'
@@ -43,7 +42,7 @@ http = R.Session()
 
 
 def setup(key_fp:Path):
-  global API_KEY, SECRET_KEY, ACCESS_TOKEN
+  global API_URL
 
   if key_fp.exists():
     with open(key_fp, 'r', encoding='utf-8') as fh:
@@ -54,17 +53,13 @@ def setup(key_fp:Path):
 
   API_KEY = os.getenv('API_KEY', API_KEY)
   SECRET_KEY = os.getenv('SECRET_KEY', SECRET_KEY)
-  API_EP = os.getenv('API_KEY', API_EP)
-
   assert API_KEY, '>> missing API_KEY'
   assert SECRET_KEY, '>> missing SECRET_KEY'
-  assert API_EP, '>> missing API_EP'
   print('>> API_KEY:', API_KEY)
   print('>> SECRET_KEY:', SECRET_KEY)
-  print('>> API_EP:', API_EP)
 
-  url = f'https://aip.baidubce.com/oauth/2.0/token?grant_type=client_credentials&client_id={API_KEY}&client_secret={SECRET_KEY}'
-  resp = http.post(url, headers=HEADERS)
+  TOKEN_URL = f'https://aip.baidubce.com/oauth/2.0/token?grant_type=client_credentials&client_id={API_KEY}&client_secret={SECRET_KEY}'
+  resp = http.post(TOKEN_URL, headers=HEADERS)
   data: Dict = resp.json()
   if 'error' in data:
     print('>> error:', data.get('error'))
@@ -75,18 +70,27 @@ def setup(key_fp:Path):
   assert ACCESS_TOKEN, '>> missing ACCESS_TOKEN'
   print('>> ACCESS_TOKEN:', ACCESS_TOKEN)
 
+  # fallback to the free API endpoint
+  API_EP = os.getenv('API_EP', API_EP)
+  API_EP = API_EP or API_EP_FREE
+  assert API_EP, '>> missing API_EP'
+  print('>> API_EP:', API_EP)
+
+  API_URL = f'https://aip.baidubce.com/rpc/2.0/ai_custom/v1/wenxinworkshop/image2text/{API_EP}?access_token={ACCESS_TOKEN}'
+  print('>> API_URL:', API_URL)
   print('=' * 72)
 
 
 def query(fp:Path, prompt:str) -> Dict:
-  url = f'https://aip.baidubce.com/rpc/2.0/ai_custom/v1/wenxinworkshop/image2text/{API_EP}?access_token={ACCESS_TOKEN}'
   payload = {
     'prompt': prompt,
-    'image': base64.b64encode(read_file(fp)).decode(),
+    'image': base64.b64encode(read_file(fp)).decode(encoding='utf-8'),
   }
   try:
-    resp = http.post(url, headers=HEADERS, json=payload, timeout=10)
+    resp = http.post(API_URL, headers=HEADERS, json=payload, timeout=10)
     data: Dict = resp.json()
+  except KeyboardInterrupt:
+    raise KeyboardInterrupt
   except:
     print_exc()
     return
@@ -94,7 +98,7 @@ def query(fp:Path, prompt:str) -> Dict:
   if 'error_code' in data:
     print('>> error_code:', data.get('error_code'))
     print('>> error_msg:', data.get('error_msg'))
-    exit(-1)
+    return
 
   print('>> resp:')
   pp(data)
@@ -117,7 +121,8 @@ def run(args):
   tot, ok, err, ign = 0, 0, 0, 0
   db = RecordDB(args.db_fp)
   try:
-    pid = db.get_prompt_id(QUERY_PROMPT)
+    prompt = QUERY_PROMPTS[args.pid]
+    pid = db.get_prompt_id(prompt)
     for fp in tqdm(fps):
       tot += 1
       iid = db.get_image_id(fp)
@@ -126,7 +131,7 @@ def run(args):
         continue
 
       ts_req = now()
-      res = query(fp, QUERY_PROMPT)
+      res = query(fp, prompt)
       ts_res = now()
       if res is None:
         print('>> error query:', fp)
@@ -147,6 +152,7 @@ def run(args):
 
 if __name__ == '__main__':
   parser = ArgumentParser()
+  parser.add_argument('-P', '--pid', default=0, type=int, help='query prompt id in the predefined list')
   parser.add_argument('-I', '--img_dp', default='outputs', type=Path, help='image folder, will walk recursively')
   parser.add_argument('-L', '--limit', default=-1, type=int, help='limit input image count')
   parser.add_argument('-O', '--db_fp', default=DB_FILE, type=Path, help='query record database file')
