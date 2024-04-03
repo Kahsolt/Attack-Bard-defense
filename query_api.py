@@ -13,6 +13,7 @@ import os
 import json
 import yaml
 import base64
+from time import sleep
 from pathlib import Path
 from pprint import pprint as pp
 from argparse import ArgumentParser
@@ -41,7 +42,7 @@ HEADERS = {
 http = R.Session()
 
 
-def setup(key_fp:Path):
+def setup(key_fp:Path, use_free:bool=False):
   global API_URL
 
   if key_fp.exists():
@@ -73,6 +74,7 @@ def setup(key_fp:Path):
   # fallback to the free API endpoint
   API_EP = os.getenv('API_EP', API_EP)
   API_EP = API_EP or API_EP_FREE
+  if use_free: API_EP = API_EP_FREE
   assert API_EP, '>> missing API_EP'
   print('>> API_EP:', API_EP)
 
@@ -98,6 +100,9 @@ def query(fp:Path, prompt:str) -> Dict:
   if 'error_code' in data:
     print('>> error_code:', data.get('error_code'))
     print('>> error_msg:', data.get('error_msg'))
+    if data.get('error_code') == 17:  # Open api daily request limit reached
+      exit(-1)
+    sleep(1)
     return
 
   print('>> resp:')
@@ -158,8 +163,9 @@ if __name__ == '__main__':
   parser.add_argument('-O', '--db_fp', default=DB_FILE, type=Path, help='query record database file')
   parser.add_argument('-K', '--key_fp', default='API_KEY.yaml', type=Path, help='credential key file (*.yaml)')
   parser.add_argument('--ignore_queried', action='store_true', help='ignore query if already has records')
+  parser.add_argument('--use_free', action='store_true', help='force use public free API endpoint')
   args = parser.parse_args()
 
-  setup(args.key_fp)
+  setup(args.key_fp, args.use_free)
 
   run(args)
