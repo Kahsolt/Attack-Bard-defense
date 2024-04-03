@@ -1,2 +1,5 @@
 # RealESRGAN
 basicsr==1.4.2
+
+# stats_dist_text
+sentence-transformers

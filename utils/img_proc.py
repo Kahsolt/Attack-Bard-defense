@@ -38,6 +38,9 @@ npimg = Union[npimg_u8, npimg_f32]
 npimg_dx = NDArray[np.int16]        # vrng [-255, 255]
 npimg_hi = NDArray[np.float32]      # vrng [-1, 1]
 
+mean = lambda x: sum(x) / len(x) if len(x) else 0.0
+img_fps_sort_fn = lambda k: int(Path(k).stem)
+
 
 def now() -> int:
   return int(datetime.now().timestamp())

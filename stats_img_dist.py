@@ -2,6 +2,8 @@
 # Author: Armit
 # Create Time: 2024/02/10
 
+# 客观度量: 模型输入图像的相似度 (正常样本 vs 对抗样本)
+
 import json
 from argparse import ArgumentParser
 
@@ -94,7 +96,7 @@ def run(args):
   dp_adv: Path = args.output
 
   adv_fps = list(dp_adv.iterdir())    # keep numerical order
-  adv_fps.sort(key=(lambda x: int(x.stem)))
+  adv_fps.sort(key=img_fps_sort_fn)
 
   results = {}
   for fp_adv in tqdm(adv_fps):
@@ -130,7 +132,7 @@ if __name__ == '__main__':
   parser = ArgumentParser()
   parser.add_argument('-I', '--input',   type=Path, default=DATA_RAW_PATH, help='clean image folder')
   parser.add_argument('-O', '--output',  type=Path, default=DATA_ADV_PATH, help='adv image folder')
-  parser.add_argument('-S', '--save_fp', type=Path, default=(LOG_PATH / 'stats_dist_meas.json'), help='result output file')
+  parser.add_argument('-S', '--save_fp', type=Path, default=(LOG_PATH / f'{Path(__file__).name}.json'), help='result output file')
   args = parser.parse_args()
 
   run(args)

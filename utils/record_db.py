@@ -93,6 +93,12 @@ class RecordDB:
     r = self.fetch_scalar('SELECT EXISTS(SELECT id FROM Query WHERE pid = ? AND iid = ?);', (pid, iid))
     return bool(r)
 
+  def get(self, prompt:Union[int, str], image:Union[int, Path, bytes]) -> List[tuple]:
+    pid = self.get_prompt_id(prompt)
+    iid = self.get_image_id(image)
+    r = self.fetch_results('SELECT res FROM Query WHERE pid = ? AND iid = ?;', (pid, iid))
+    return r
+
   def add(self, prompt:Union[int, str], image:Union[int, Path, bytes], res:str, ts_req:int=None, ts_res:int=None, provider:str=None):
     pid = self.get_prompt_id(prompt)
     iid = self.get_image_id(image)
