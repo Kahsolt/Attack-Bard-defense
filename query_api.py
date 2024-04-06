@@ -42,20 +42,27 @@ HEADERS = {
 http = R.Session()
 
 
-def setup(key_fp:Path, use_free:bool=False):
+def setup(key_fp:Path, use_private:bool=False):
   global API_URL
 
   if key_fp.exists():
     with open(key_fp, 'r', encoding='utf-8') as fh:
       data = yaml.safe_load(fh)
-      API_KEY = data['API_KEY']
-      SECRET_KEY = data['SECRET_KEY']
-      API_EP = data['API_EP']
+      API_KEY = data.get('API_KEY')
+      SECRET_KEY = data.get('SECRET_KEY')
+      if use_private:
+        API_EP = data.get('API_EP', API_EP_FREE)
+      else:
+        API_EP = API_EP_FREE
 
+  API_EP = os.getenv('API_EP', API_EP)
   API_KEY = os.getenv('API_KEY', API_KEY)
   SECRET_KEY = os.getenv('SECRET_KEY', SECRET_KEY)
+
+  assert API_EP, '>> missing API_EP'
   assert API_KEY, '>> missing API_KEY'
   assert SECRET_KEY, '>> missing SECRET_KEY'
+  print('>> API_EP:', API_EP)
   print('>> API_KEY:', API_KEY)
   print('>> SECRET_KEY:', SECRET_KEY)
 
@@ -70,13 +77,6 @@ def setup(key_fp:Path, use_free:bool=False):
   ACCESS_TOKEN = data.get('access_token')
   assert ACCESS_TOKEN, '>> missing ACCESS_TOKEN'
   print('>> ACCESS_TOKEN:', ACCESS_TOKEN)
-
-  # fallback to the free API endpoint
-  API_EP = os.getenv('API_EP', API_EP)
-  API_EP = API_EP or API_EP_FREE
-  if use_free: API_EP = API_EP_FREE
-  assert API_EP, '>> missing API_EP'
-  print('>> API_EP:', API_EP)
 
   API_URL = f'https://aip.baidubce.com/rpc/2.0/ai_custom/v1/wenxinworkshop/image2text/{API_EP}?access_token={ACCESS_TOKEN}'
   print('>> API_URL:', API_URL)
@@ -98,12 +98,16 @@ def query(fp:Path, prompt:str) -> Dict:
     return
 
   if 'error_code' in data:
-    print('>> error_code:', data.get('error_code'))
+    # Error Code List: https://cloud.baidu.com/doc/WENXINWORKSHOP/s/tlmyncueh
+    error_code = data['error_code']
+    print('>> error_code:', error_code)
     print('>> error_msg:', data.get('error_msg'))
-    if data.get('error_code') == 17:  # Open api daily request limit reached
-      exit(-1)
     sleep(1)
-    return
+
+    if error_code == 17:  # Open api daily request limit reached
+      exit(-1)
+    elif error_code == 336311: # image2text input image illegal / invalid image
+      pass
 
   print('>> resp:')
   pp(data)
@@ -119,8 +123,12 @@ def walk(dp:Path):
 
 
 def run(args):
-  fps = list(walk(args.img_dp))
-  fps.sort()  # somewhat keep ordered
+  if args.recursive:  # somewhat keep ordered, for deep recursive folder
+    fps = list(walk(args.img_dp))
+    fps.sort()
+  else:               # keep ordered, for single flatten folder
+    fps = list(Path(args.img_dp).iterdir())
+    fps.sort(key=img_fps_sort_fn)
   if args.limit > 0: fps = fps[:args.limit]
 
   tot, ok, err, ign = 0, 0, 0, 0
@@ -131,7 +139,7 @@ def run(args):
     for fp in tqdm(fps):
       tot += 1
       iid = db.get_image_id(fp)
-      if args.ignore_queried and db.has(pid, iid):
+      if not args.allow_duplicate and db.has(pid, iid):
         ign += 1
         continue
 
@@ -158,14 +166,15 @@ def run(args):
 if __name__ == '__main__':
   parser = ArgumentParser()
   parser.add_argument('-P', '--pid', default=0, type=int, help='query prompt id in the predefined list')
-  parser.add_argument('-I', '--img_dp', default='outputs', type=Path, help='image folder, will walk recursively')
+  parser.add_argument('-I', '--img_dp', default='outputs', type=Path, help='image folder')
   parser.add_argument('-L', '--limit', default=-1, type=int, help='limit input image count')
   parser.add_argument('-O', '--db_fp', default=DB_FILE, type=Path, help='query record database file')
   parser.add_argument('-K', '--key_fp', default='API_KEY.yaml', type=Path, help='credential key file (*.yaml)')
-  parser.add_argument('--ignore_queried', action='store_true', help='ignore query if already has records')
-  parser.add_argument('--use_free', action='store_true', help='force use public free API endpoint')
+  parser.add_argument('--recursive', action='store_true', help='walk recursively in --img_dp')
+  parser.add_argument('--allow_duplicate', action='store_true', help='allow repeated query even if already has records')
+  parser.add_argument('--use_private', action='store_true', help='force use private deployed API endpoint rather than free')
   args = parser.parse_args()
 
-  setup(args.key_fp, args.use_free)
+  setup(args.key_fp, args.use_private)
 
   run(args)

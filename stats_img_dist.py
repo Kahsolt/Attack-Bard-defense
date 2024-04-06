@@ -132,7 +132,7 @@ if __name__ == '__main__':
   parser = ArgumentParser()
   parser.add_argument('-I', '--input',   type=Path, default=DATA_RAW_PATH, help='clean image folder')
   parser.add_argument('-O', '--output',  type=Path, default=DATA_ADV_PATH, help='adv image folder')
-  parser.add_argument('-S', '--save_fp', type=Path, default=(LOG_PATH / f'{Path(__file__).name}.json'), help='result output file')
+  parser.add_argument('-S', '--save_fp', type=Path, default=(LOG_PATH / f'{Path(__file__).stem}.json'), help='result output file')
   args = parser.parse_args()
 
   run(args)
