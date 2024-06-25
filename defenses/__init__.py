@@ -32,3 +32,11 @@ def get_dfn():
   parser.add_argument('--dfn', required=True, choices=DEFENSES.keys())
   args, _ = parser.parse_known_args()
   return DEFENSES[args.dfn]()
+
+
+def get_cmdargs() -> int:    # FIXME: this shouldn't be put here
+  parser = ArgumentParser()
+  parser.add_argument('-L', '--limit', default=100, type=int)
+  parser.add_argument('-O', '--output')
+  args, _ = parser.parse_known_args()
+  return args

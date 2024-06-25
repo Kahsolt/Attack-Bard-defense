@@ -5,9 +5,10 @@ from utils.ImageHandling import save_multi_images, save_image, get_list_image
 from torchvision import transforms
 import os
 
-from defenses import get_dfn
+from defenses import get_dfn, get_cmdargs
+args = get_cmdargs()
 
-images = get_list_image("./dataset/NIPS17", limit=100)
+images = get_list_image("./dataset/NIPS17", limit=args.limit)
 resizer = transforms.Resize((224, 224))
 images = [resizer(i).unsqueeze(0) for i in images]
 
@@ -45,7 +46,7 @@ attacker = SSA_CommonWeakness(
 )
 
 id = 0
-dir = "./attack_vlm_misclassify/"
+dir = args.output or "./attack_vlm_misclassify/"
 if not os.path.exists(dir):
     os.mkdir(dir)
 for i, x in enumerate(tqdm(images)):

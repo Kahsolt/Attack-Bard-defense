@@ -11,9 +11,10 @@ from attacks import SpectrumSimulationAttack, SSA_CommonWeakness
 from torchvision import transforms
 import os
 
-from defenses import get_dfn
+from defenses import get_dfn, get_cmdargs
+args = get_cmdargs()
 
-images = get_list_image("./dataset/NIPS17", limit=100)
+images = get_list_image("./dataset/NIPS17", limit=args.limit)
 resizer = transforms.Resize((224, 224))
 images = [resizer(i).unsqueeze(0) for i in images]
 
@@ -43,11 +44,12 @@ attacker = SSA_CommonWeakness(
     criterion=ssa_cw_loss,
 )
 
-dir = "./attack_img_encoder_misdescription/"
+dir = args.output or "./attack_img_encoder_misdescription/"
 if not os.path.exists(dir):
     os.mkdir(dir)
 id = 0
 for i, x in enumerate(tqdm(images)):
+    print(f'>> img-{i}')
     x = x.cuda()
     ssa_cw_loss.set_ground_truth(x)
     adv_x = attacker(x, None)

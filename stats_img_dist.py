@@ -4,6 +4,7 @@
 
 # 客观度量: 模型输入图像的相似度 (正常样本 vs 对抗样本)
 
+import os
 import json
 from argparse import ArgumentParser
 
@@ -119,8 +120,11 @@ def run(args):
       'min': data.min(),
     }
 
-  print(f'>> save to {args.save_fp}')
-  with open(args.save_fp, 'w', encoding='utf-8') as fh:
+  out_dp: Path = LOG_PATH / Path(__file__).stem
+  out_dp.mkdir(exist_ok=True)
+  save_fp = out_dp / f'{str(args.output).replace(os.sep, ".")}.json'
+  print(f'>> save to {save_fp}')
+  with open(save_fp, 'w', encoding='utf-8') as fh:
     data = {
       'stats': stats,
       'results': results,
@@ -130,9 +134,8 @@ def run(args):
 
 if __name__ == '__main__':
   parser = ArgumentParser()
-  parser.add_argument('-I', '--input',   type=Path, default=DATA_RAW_PATH, help='clean image folder')
-  parser.add_argument('-O', '--output',  type=Path, default=DATA_ADV_PATH, help='adv image folder')
-  parser.add_argument('-S', '--save_fp', type=Path, default=(LOG_PATH / f'{Path(__file__).stem}.json'), help='result output file')
+  parser.add_argument('-I', '--input',  type=Path, default=DATA_RAW_PATH, help='clean image folder')
+  parser.add_argument('-O', '--output', type=Path, default=DATA_ADV_PATH, help='adv image folder')
   args = parser.parse_args()
 
   run(args)
