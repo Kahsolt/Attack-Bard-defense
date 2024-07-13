@@ -1,14 +1,51 @@
 ''' input range is [0, 1] in float32 '''
 
-from .blur_and_sharpen import BlurAndSharpen_dfn, BlurAndSharpenMy_dfn
-from .realesrgan import RealESRGAN_dfn
-from .scunet import SCUNet_dfn
-from .ddnm import DDNM_dfn
-from .mae import MAE_dfn
-from .dmae import DMAE_dfn
-from .comdefend import ComDefend_dfn
-from .jpeg import JPEG_dfn
-from .local_grad_smooth import LGS_dfn
+try:
+  from .blur_and_sharpen import BlurAndSharpen_dfn, BlurAndSharpenMy_dfn
+except ImportError:
+  BlurAndSharpen_dfn = None
+  BlurAndSharpenMy_dfn = None
+  print('>> WARN: blur_and_sharpen not available')
+try:
+  from .realesrgan import RealESRGAN_dfn
+except ImportError:
+  RealESRGAN_dfn = None
+  print('>> WARN: realesrgan not available')
+try:
+  from .scunet import SCUNet_dfn
+except:
+  SCUNet_dfn = None
+  print('>> WARN: scunet not available')
+try:
+  from .ddnm import DDNM_dfn
+except:
+  DDNM_dfn = None
+  print('>> WARN: ddnm not available')
+try:
+  from .mae import MAE_dfn
+except:
+  MAE_dfn = None
+  print('>> WARN: mae not available')
+try:
+  from .dmae import DMAE_dfn
+except:
+  DMAE_dfn = None
+  print('>> WARN: dmae not available')
+try:
+  from .comdefend import ComDefend_dfn
+except:
+  ComDefend_dfn = None
+  print('>> WARN: comdefend not available')
+try:
+  from .jpeg import JPEG_dfn
+except:
+  JPEG_dfn = None
+  print('>> WARN: jpeg not available')
+try:
+  from .local_grad_smooth import LGS_dfn
+except:
+  LGS_dfn = None
+  print('>> WARN: local_grad_smooth not available')
 
 from .utils import *
 

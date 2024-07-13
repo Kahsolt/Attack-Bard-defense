@@ -23,5 +23,5 @@ device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
 
 def register_path(dp:Path):
-  assert dp.is_dir()
-  sys.path.append(str(dp))
+  if dp.is_dir():
+    sys.path.append(str(dp))
