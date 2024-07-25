@@ -27,6 +27,7 @@
 - 参考README.md，下载对应的权重文件放在对应仓库的 `models` 的目录下 (自行创建)
 - 文件 `repo\mae\util\pos_embed.py` 第 56 行 `np.float` 改为 `np.float32`
 
+
 ### dMAE
 
 - 参考README.md，下载对应的权重文件放在对应仓库的 `models` 的目录下 (自行创建)
@@ -35,3 +36,9 @@
 ### local_grad_smooth
 
 - 注释掉 `repo\local_gradients_smoothing\lgs\__init__.py` 第 3~5 行
+
+
+### DDNM
+
+- 参考README.md，下载权重文件 https://openaipublic.blob.core.windows.net/diffusion/jul-2021/256x256_diffusion_uncond.pt 放在 `DDNM/exp/logs/imagenet/`
+
