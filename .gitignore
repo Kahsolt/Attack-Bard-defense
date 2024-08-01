@@ -250,3 +250,4 @@ ref/
 # API_KEY
 API_KEY.*
 !API_KEY.*.example
+weights-7b
