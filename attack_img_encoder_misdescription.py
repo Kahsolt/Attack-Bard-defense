@@ -7,7 +7,8 @@ from surrogates import (
 )
 from utils import get_list_image, save_list_images
 from tqdm import tqdm
-from attacks import SpectrumSimulationAttack, SSA_CommonWeakness
+#from attacks import SpectrumSimulationAttack, SSA_CommonWeakness
+from attacks import *
 from torchvision import transforms
 import os
 
@@ -34,15 +35,16 @@ def ssa_cw_count_to_index(count, num_models=len(models), ssa_N=20):
 
 ssa_cw_loss = EnsembleFeatureLoss(models, ssa_cw_count_to_index, feature_loss=torch.nn.MSELoss())
 
+attacker = get_atk(model=models, criterion=ssa_cw_loss)
 
-attacker = SSA_CommonWeakness(
-    models,
-    dfn=dfn,
-    epsilon=16 / 255,
-    step_size=1 / 255,
-    total_step=100,
-    criterion=ssa_cw_loss,
-)
+#attacker = SSA_CommonWeakness(
+#    models,
+#    dfn=dfn,
+#    epsilon=16 / 255,
+#    step_size=1 / 255,
+#    total_step=100,
+#    criterion=ssa_cw_loss,
+#)
 
 dir = args.output or "./attack_img_encoder_misdescription/"
 if not os.path.exists(dir):

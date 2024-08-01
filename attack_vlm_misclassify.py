@@ -1,6 +1,6 @@
 from tqdm import tqdm
 from surrogates import get_gpt4_image_model, Blip2VisionModel, InstructBlipVisionModel
-from attacks import SpectrumSimulationAttack, SSA_CommonWeakness
+from attacks import *
 from utils.ImageHandling import save_multi_images, save_image, get_list_image
 from torchvision import transforms
 import os
@@ -36,14 +36,16 @@ gpt4 = get_gpt4_image_model(target_text=target_text)
 
 dfn = get_dfn()
 
-attacker = SSA_CommonWeakness(
-    [instruct_blip, blip2, gpt4],
-    dfn=dfn,
-    epsilon=16 / 255,
-    step_size=1 / 255,
-    total_step=500,
-    criterion=GPT4AttackCriterion(),
-)
+attacker = get_atk(model=[instruct_blip, blip2, gpt4], criterion=GPT4AttackCriterion())
+
+#attacker = SSA_CommonWeakness(
+#    [instruct_blip, blip2, gpt4],
+#    dfn=dfn,
+#    epsilon=16 / 255,
+#    step_size=1 / 255,
+#    total_step=500,
+#    criterion=GPT4AttackCriterion(),
+#)
 
 id = 0
 dir = args.output or "./attack_vlm_misclassify/"
