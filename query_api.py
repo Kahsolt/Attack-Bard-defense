@@ -31,6 +31,7 @@ QUERY_PROMPTS = [
 ]
 
 PROVIDER = 'fuyu_8b'
+DB_FILE = LOG_PATH / 'record.db'
 
 API_EP_FREE = 'fuyu_8b'
 API_URL = None

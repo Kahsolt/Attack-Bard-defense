@@ -7,8 +7,6 @@ import sqlite3
 
 from utils.img_proc import *
 
-DB_FILE = LOG_PATH / 'record.db'
-
 
 # https://www.sqlitetutorial.net/
 SQL_INIT_DB = '''
@@ -40,7 +38,7 @@ CREATE TABLE IF NOT EXISTS Query (
 
 class RecordDB:
 
-  def __init__(self, fp:Path=DB_FILE) -> None:
+  def __init__(self, fp:Path) -> None:
     self.cx = sqlite3.connect(fp, isolation_level='IMMEDIATE')
     self.cu = self.cx.cursor()
     self.cu.executescript(SQL_INIT_DB)

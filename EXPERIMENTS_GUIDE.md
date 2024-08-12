@@ -33,7 +33,7 @@
 
 > 图像识别后的文本相似性度量评价
 
-⚪ 首先跑图生文模型（百度fuyu-8b），或者主动收集图像描述文本 (**暂未实现**)
+⚪ 首先跑在线云服务的图生文模型（百度fuyu-8b）
 
 - 配置 AUTH 信息
   - 复制文件 `API_KEY.yaml.example` 并重命名为 `API_KEY.yaml.example`
@@ -41,10 +41,16 @@
 - run `python query_api.py -I <path/to/img/folder> -P <pid> -L <limit>`
   - e.g.: `python query_api.py -I outputs/adv -P 0 -L 100`
 
+或者本地的图生文模型（llava-7b）
+
+- `export MODEL_NAME_OR_PATH=...` 设置 `llava-1.5-7b-hf` 仓库的本地路径
+- run `python query_model.py -I <path/to/img/folder> -P <pid> -L <limit>`
+  - e.g.: `python query_model.py -I outputs/adv -P 0 -L 100`
+
 ⚪ 然后跑文本相似度模型
 
-- run `python stats_txt_sim.py -M <model> -AX <path/to/img/folder>`
-  - e.g.: `python stats_txt_sim.py -M all-MiniLM-L6-v2 -AX outputs/adv`
+- run `python stats_txt_sim.py -M <model> -AX <path/to/img/folder> --db_fp <path/to/record.db>`
+  - e.g.: `python stats_txt_sim.py -M all-MiniLM-L6-v2 -AX outputs/adv --db_fp log/record.db`
 
 
 ### 操作流程最小案例
@@ -56,10 +62,12 @@
 python attack_img_encoder_misdescription.py --dfn none --limit 4 --output outputs/test
 # run img-sim eval
 python stats_img_dist.py -O outputs/test
-# run online query img2txt
-python query_api.py -I outputs/test
+# run online/local query img2txt
+python query_api.py -I outputs/test --db_fp log/record.db
+python query_model.py -I outputs/test --db_fp log/record-llava.db
 # run txt-sim eval
-python stats_txt_sim.py -M all-MiniLM-L6-v2 -AX outputs/test
+python stats_txt_sim.py -M all-MiniLM-L6-v2 -AX outputs/test --db_fp log/record.db
+python stats_txt_sim.py -M all-MiniLM-L6-v2 -AX outputs/test --db_fp log/record-llava.db
 ```
 
 ----
