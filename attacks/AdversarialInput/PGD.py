@@ -12,6 +12,7 @@ from .AdversarialInputBase import AdversarialInputAttacker
 class PGD(AdversarialInputAttacker):
     def __init__(self,
                  model: List[nn.Module],
+                 dfn: Callable = nn.Identity(),
                  total_step: int = 10,
                  random_start: bool = True,
                  step_size: float = 16 / 255 / 10,
@@ -30,6 +31,7 @@ class PGD(AdversarialInputAttacker):
         self.criterion = criterion
         self.targerted_attack = targeted_attack
         super(PGD, self).__init__(model, *args, **kwargs)
+        self.dfn = dfn
 
     def perturb(self, x):
         x = x + (torch.rand_like(x) - 0.5) * 2 * self.epsilon
@@ -47,6 +49,7 @@ class PGD(AdversarialInputAttacker):
             x.requires_grad = True
             eot_xs = x.repeat(self.eot_step, 1, 1, 1).split(self.eot_batch_size * B, dim=0)
             for eot_x in eot_xs:
+                eot_x = self.dfn(eot_x)
                 logit = 0
                 for model in self.models:
                     logit += model(eot_x.to(model.device)).to(x.device)

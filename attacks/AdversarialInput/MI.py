@@ -8,6 +8,7 @@ from .AdversarialInputBase import AdversarialInputAttacker
 class MI_FGSM(AdversarialInputAttacker):
     def __init__(self,
                  model: List[nn.Module],
+                 dfn: Callable = nn.Identity(),
                  total_step: int = 10, random_start: bool = False,
                  step_size: float = 16 / 255 / 10,
                  criterion: Callable = nn.CrossEntropyLoss(),
@@ -22,6 +23,7 @@ class MI_FGSM(AdversarialInputAttacker):
         self.targerted_attack = targeted_attack
         self.mu = mu
         super(MI_FGSM, self).__init__(model, *args, **kwargs)
+        self.dfn = dfn
 
     def perturb(self, x):
         x = x + (torch.rand_like(x) - 0.5) * 2 * self.epsilon
@@ -37,6 +39,7 @@ class MI_FGSM(AdversarialInputAttacker):
 
         for _ in range(self.total_step):
             x.requires_grad = True
+            x = self.dfn(x)
             logit = 0
             for model in self.models:
                 logit += model(x.to(model.device)).to(x.device)

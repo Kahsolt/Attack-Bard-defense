@@ -15,6 +15,7 @@ class DI_MI_FGSM(AdversarialInputAttacker):
 
     def __init__(self,
                  model: List[nn.Module],
+                 dfn: Callable = nn.Identity(),
                  total_step: int = 10,
                  random_start: bool = False,
                  step_size: float = 16 / 255 / 10,
@@ -33,6 +34,7 @@ class DI_MI_FGSM(AdversarialInputAttacker):
         self.aug_policy = transforms.Compose([
             transforms.RandomCrop((224, 224), padding=224 - int(224 * 0.9)),
         ])
+        self.dfn = dfn
         self.init()
 
     def perturb(self, x):
@@ -50,6 +52,7 @@ class DI_MI_FGSM(AdversarialInputAttacker):
         for _ in range(self.total_step):
             x.requires_grad = True
             aug_x = self.aug_policy(x)
+            aug_x = self.dfn(aug_x)
             logit = 0
             for model in self.models:
                 logit += model(aug_x.to(model.device)).to(x.device)
