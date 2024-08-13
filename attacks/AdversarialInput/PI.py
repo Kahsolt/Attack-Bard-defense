@@ -40,7 +40,7 @@ class PI_FGSM(AdversarialInputAttacker):
         x = clamp(x)
         return x
 
-    # def attack(self, x, y, ):
+    # def attack(self, x, y):
     #     N = x.shape[0]
     #     original_x = x.clone()
     #     a = torch.zeros_like(x)

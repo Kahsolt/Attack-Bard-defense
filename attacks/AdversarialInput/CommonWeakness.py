@@ -37,7 +37,7 @@ class MI_CosineSimilarityEncourager(AdversarialInputAttacker):
         x = clamp(x)
         return x
 
-    def attack(self, x, y, ):
+    def attack(self, x, y):
         N = x.shape[0]
         original_x = x.clone()
         momentum = torch.zeros_like(x)
@@ -139,7 +139,7 @@ class MI_RandomWeight(AdversarialInputAttacker):
         x = x + mean  # expectation is mean
         return x
 
-    def attack(self, x, y, ):
+    def attack(self, x, y):
         N = x.shape[0]
         original_x = x.clone()
         momentum = torch.zeros_like(x)
@@ -214,7 +214,7 @@ class MI_CommonWeakness(AdversarialInputAttacker):
         x = clamp(x)
         return x
 
-    def attack(self, x, y, ):
+    def attack(self, x, y):
         N = x.shape[0]
         original_x = x.clone()
         inner_momentum = torch.zeros_like(x)
@@ -354,7 +354,7 @@ class Adam_CommonWeakness(AdversarialInputAttacker):
         x = clamp(x)
         return x
 
-    def attack(self, x, y, ):
+    def attack(self, x, y):
         N = x.shape[0]
         original_x = x.clone()
         inner_momentum = torch.zeros_like(x)

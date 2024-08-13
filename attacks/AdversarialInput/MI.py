@@ -9,7 +9,8 @@ class MI_FGSM(AdversarialInputAttacker):
     def __init__(self,
                  model: List[nn.Module],
                  dfn: Callable = nn.Identity(),
-                 total_step: int = 10, random_start: bool = False,
+                 total_step: int = 10, 
+                 random_start: bool = True,
                  step_size: float = 16 / 255 / 10,
                  criterion: Callable = nn.CrossEntropyLoss(),
                  targeted_attack=False,
@@ -30,7 +31,7 @@ class MI_FGSM(AdversarialInputAttacker):
         x = clamp(x)
         return x
 
-    def attack(self, x, y, ):
+    def attack(self, x, y):
         N = x.shape[0]
         original_x = x.clone()
         momentum = torch.zeros_like(x)
@@ -40,11 +41,10 @@ class MI_FGSM(AdversarialInputAttacker):
         for _ in range(self.total_step):
             x.requires_grad = True
             x = self.dfn(x)
-            logit = 0
             for model in self.models:
-                logit += model(x.to(model.device)).to(x.device)
-            loss = self.criterion(logit, y)
-            loss.backward()
+                logit = model(x.to(model.device)).to(x.device)
+                loss = self.criterion(logit, y)
+                loss.backward()
             grad = x.grad
             x.requires_grad = False
             # update
@@ -56,3 +56,4 @@ class MI_FGSM(AdversarialInputAttacker):
                 x += self.step_size * momentum.sign()
             x = self.clamp(x, original_x)
         return x
+ 

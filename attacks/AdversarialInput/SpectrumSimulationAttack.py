@@ -245,7 +245,7 @@ class SpectrumSimulationAttack(AdversarialInputAttacker):
         x = clamp(x)
         return x
 
-    def attack(self, x, y, ):
+    def attack(self, x, y):
         """
         The attack algorithm of our proposed Spectrum Simulate Attack
         :param images: the input images
@@ -326,7 +326,7 @@ class SSA_CommonWeakness(AdversarialInputAttacker):
         x = clamp(x)
         return x
 
-    def attack(self, x, y, ):
+    def attack(self, x, y):
         N = x.shape[0]
         original_x = x.clone()
         inner_momentum = torch.zeros_like(x)
@@ -358,18 +358,14 @@ class SSA_CommonWeakness(AdversarialInputAttacker):
             for model in self.models:
                 x.requires_grad = True
                 grad = self.get_grad(x, y, model)
-                self.grad_record.append(grad)
+                #self.grad_record.append(grad)
                 x.requires_grad = False
                 # update
                 if self.targerted_attack:
-                    inner_momentum = self.mu * inner_momentum - grad / (
-                                torch.norm(grad.reshape(N, -1), p=2, dim=1).view(
-                                    N, 1, 1, 1) + 1e-5)
+                    inner_momentum = self.mu * inner_momentum - grad / (torch.norm(grad.reshape(N, -1), p=2, dim=1).view(N, 1, 1, 1) + 1e-5)
                     x += self.inner_step_size * inner_momentum
                 else:
-                    inner_momentum = self.mu * inner_momentum + grad / (
-                                torch.norm(grad.reshape(N, -1), p=2, dim=1).view(
-                                    N, 1, 1, 1) + 1e-5)
+                    inner_momentum = self.mu * inner_momentum + grad / (torch.norm(grad.reshape(N, -1), p=2, dim=1).view(N, 1, 1, 1) + 1e-5)
                     x += self.inner_step_size * inner_momentum
                 x = clamp(x)
                 x = clamp(x, original_x - self.epsilon, original_x + self.epsilon)
@@ -415,22 +411,22 @@ class SSA_CommonWeakness(AdversarialInputAttacker):
         N = 20
         sigma = 16
         noise = 0
+        device = model.device
         for n in range(N):
             x.requires_grad = True
-            gauss = torch.randn(*x.shape) * (sigma / 255)
-            gauss = gauss.cuda()
-            x_dct = dct_2d(x + gauss).cuda()
-            mask = (torch.rand_like(x) * 2 * rho + 1 - rho).cuda()
+            gauss = torch.randn(*x.shape, device=device) * (sigma / 255)
+            x_dct = dct_2d(x + gauss)
+            mask = torch.rand_like(x, device=device) * 2 * rho + 1 - rho
             x_idct = idct_2d(x_dct * mask)
-            x_idct = V(x_idct, requires_grad=True)
-            x = x_idct.to(model.device).to(torch.device("cuda:0"))
+            x = V(x_idct, requires_grad=True)
+
             x = self.dfn(x)
-            logit = model(x).to(x_idct.device)
+            logit = model(x)
             loss = self.criterion(logit, y)
             loss.backward()
+
             x = x.detach()
             x.requires_grad = False
-            noise += x_idct.grad.data
+            noise += x.grad.data
             x.grad = None
-        noise = noise / N
-        return noise
+        return noise / N

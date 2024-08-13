@@ -2,8 +2,9 @@
 
 REM configs
 SET MODEL=all-MiniLM-L6-v2
+SET DB=log\record-llava.db
 
-SET RUNNER=python stats_txt_sim.py -M %MODEL%
+SET RUNNER=python stats_txt_sim.py -M %MODEL% --db_fp %DB%
 
 :adv
 %RUNNER% -AX dataset\ssa-cwa-200

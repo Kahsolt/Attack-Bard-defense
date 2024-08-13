@@ -47,14 +47,13 @@ class PGD(AdversarialInputAttacker):
 
         for _ in range(self.total_step):
             x.requires_grad = True
+            x = self.dfn(x)
             eot_xs = x.repeat(self.eot_step, 1, 1, 1).split(self.eot_batch_size * B, dim=0)
             for eot_x in eot_xs:
-                eot_x = self.dfn(eot_x)
-                logit = 0
                 for model in self.models:
-                    logit += model(eot_x.to(model.device)).to(x.device)
-                loss = self.criterion(logit, y.repeat(eot_x.shape[0] // y.shape[0]))
-                loss.backward()
+                    logit = model(eot_x.to(model.device)).to(x.device)
+                    loss = self.criterion(logit, None if y is None else y.repeat(eot_x.shape[0] // y.shape[0]))
+                    loss.backward()
             grad = x.grad / self.eot_step
             x.requires_grad = False
             # update

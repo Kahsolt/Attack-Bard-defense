@@ -9,21 +9,22 @@ from defenses import get_dfn
 from .AdversarialInput import *
 
 
+# 非注释项已加入了 dfn 参数
 ATTACKS = {
   'none': nn.Identity,
   #'ssa': SpectrumSimulationAttack,
   'ssa_cw': SSA_CommonWeakness,
   #'pi': PI_FGSM,
-  #'naattack': NAttack,
+  'nattack': NAttack,
   #'svre': MI_SVRE,
   'di': DI_MI_FGSM,
-  #'sgd': SGD,
-  #'ti': MI_TI_FGSM,
+  'sgd': SGD,
+  'ti': MI_TI_FGSM,
   #'vmi_fgsm': VMI_FGSM,
   #'vmi_in_com': VMI_Inner_CommonWeakness,
   #'vmi_out_com': VMI_Outer_CommonWeakness,
-  #'bim': BIM,
-  #'fgsm': FGSM,
+  'bim': BIM,
+  'fgsm': FGSM,
   'pgd': PGD,
   'mi': MI_FGSM,
   #'mi_rap': MI_RAP,

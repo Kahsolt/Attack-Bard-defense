@@ -8,17 +8,22 @@ __all__ = ['NAttack']
 
 
 class NAttack(AdversarialInputAttacker):
-    def __init__(self, model: List[nn.Module],
+    def __init__(self,
+                 model: List[nn.Module],
+                 dfn: Callable = nn.Identity(),
                  total_step: int = 600,
                  step_size: float = 0.008,
                  batch_size=300,
                  sigma=0.1,
+                 *args,
+                 **kwargs,
                  ):
         self.total_step = total_step
         self.step_size = step_size
         self.batch_size = batch_size
         super(NAttack, self).__init__(model, *args, **kwargs)
         self.sigma = sigma
+        self.dfn = dfn
 
     def perturb(self, x):
         x = x + (torch.rand_like(x) - 0.5) * 2 * self.epsilon
@@ -32,7 +37,7 @@ class NAttack(AdversarialInputAttacker):
         return clamp(clamp(noise, mu - self.epsilon, mu + self.epsilon))
 
     @torch.no_grad()
-    def attack(self, x, y, ):
+    def attack(self, x, y):
         assert x.shape[0] == 1, 'now only support batch size = 1'
         x.requires_grad = False
         N, C, H, D = x.shape
@@ -47,6 +52,7 @@ class NAttack(AdversarialInputAttacker):
             samples = self.proj(original_x, samples)
             z_scores = []
             for model in self.models:
+                samples = self.dfn(samples)
                 out = model(samples)
                 pre = torch.max(out, dim=1)[1]
                 mask = (pre != y).float()

@@ -31,7 +31,7 @@ class VMI_FGSM(AdversarialInputAttacker):
         x = clamp(x)
         return x
 
-    def attack(self, x, y, ):
+    def attack(self, x, y):
         N = x.shape[0]
         original_x = x.clone()
         momentum = torch.zeros_like(x)
@@ -129,7 +129,7 @@ class VMI_Inner_CommonWeakness(AdversarialInputAttacker):
         x = clamp(x)
         return x
 
-    def attack(self, x, y, ):
+    def attack(self, x, y):
         N = x.shape[0]
         original_x = x.clone()
         inner_momentum = torch.zeros_like(x)
@@ -285,7 +285,7 @@ class VMI_Outer_CommonWeakness(AdversarialInputAttacker):
         x = clamp(x)
         return x
 
-    def attack(self, x, y, ):
+    def attack(self, x, y):
         original_x = x.clone()
         inner_momentum = None
         self.outer_momentum = torch.zeros_like(x)

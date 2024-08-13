@@ -66,7 +66,7 @@ DEFENSES = {
 
 def get_dfn():
   parser = ArgumentParser()
-  parser.add_argument('--dfn', required=True, choices=DEFENSES.keys())
+  parser.add_argument('-dfn', '--dfn', default='none', choices=DEFENSES.keys())
   args, _ = parser.parse_known_args()
   return DEFENSES[args.dfn]()
 

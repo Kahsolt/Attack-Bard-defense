@@ -30,7 +30,7 @@ from .AdversarialInputBase import AdversarialInputAttacker
 #         x = clamp(x)
 #         return x
 #
-#     def attack(self, x, y, ):
+#     def attack(self, x, y):
 #         N = x.shape[0]
 #         original_x = x.clone()
 #         momentum = torch.zeros_like(x)
@@ -99,7 +99,7 @@ class MI_SAM(AdversarialInputAttacker):
         x = clamp(x)
         return x
 
-    def attack(self, x, y, ):
+    def attack(self, x, y):
         N = x.shape[0]
         original_x = x.clone()
         momentum = torch.zeros_like(x)
@@ -175,7 +175,7 @@ class MI_RAP(AdversarialInputAttacker):
         x = clamp(x)
         return x
 
-    def attack(self, x, y, ):
+    def attack(self, x, y):
         N = x.shape[0]
         original_x = x.clone()
         momentum = torch.zeros_like(x)

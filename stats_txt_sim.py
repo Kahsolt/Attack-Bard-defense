@@ -13,7 +13,7 @@ from sentence_transformers import SentenceTransformer
 from sentence_transformers.util import pairwise_dot_score, pairwise_cos_sim, pairwise_angle_sim
 import matplotlib.pyplot as plt
 
-from query_api import QUERY_PROMPTS
+from query_model import QUERY_PROMPTS, DB_FILE
 from utils.record_db import *
 from utils.img_proc import *
 
